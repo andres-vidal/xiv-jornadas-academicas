@@ -1,0 +1,23 @@
+{
+  "name": "y-si-miramos-por-otro-lado",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && cp dist/index.html dist/404.html",
+    "build:pages": "BASE_PATH=/xiv-jornadas-academicas/ npm run build"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.1.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.2.2",
+    "vite-plugin-singlefile": "^2.3.3"
+  },
+  "dependencies": {
+    "@floating-ui/react": "^0.27.20",
+    "react-router-dom": "^7.18.3"
+  }
+}

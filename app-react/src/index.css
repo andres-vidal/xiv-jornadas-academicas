@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "PT Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "PT Mono", Consolas, ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Paleta de las XIV Jornadas Académicas, idéntica a la del póster.
+     La app acompaña una pieza impresa en papel blanco: se compromete con el
+     modo claro en los dos temas para que los colores coincidan. */
+  --color-fondo:  #f7f7f7;
+  --color-papel:  #ffffff;
+  --color-panel:  #eef0f4;
+  --color-tinta:  #222222;
+  --color-tinta2: #414a4f;
+  --color-mudo:   #6b7378;
+  --color-regla:  #d7dce3;
+
+  --color-jj-azul:     #3b5072;
+  --color-jj-celeste:  #9bcad8;
+  --color-jj-naranja:  #e8662e;
+  --color-jj-amarillo: #f8ae20;
+}
+
+@layer base {
+  html { color-scheme: light }
+  html, body { overflow-x: hidden }
+  body { background: var(--color-fondo); color: var(--color-tinta); -webkit-font-smoothing: antialiased }
+  h1, h2, h3 { text-wrap: balance }
+
+  /* el slider no se puede armar solo con utilidades */
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none;
+    height: 18px; background: transparent; margin: 0;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 3px; background: var(--color-regla); border-radius: 2px;
+  }
+  input[type="range"]::-moz-range-track {
+    height: 3px; background: var(--color-regla); border-radius: 2px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 17px; height: 17px; border-radius: 50%;
+    background: var(--color-tinta); border: 2px solid var(--color-papel);
+    margin-top: -7px; box-shadow: 0 1px 3px rgb(0 0 0 / .3); cursor: grab;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 17px; height: 17px; border-radius: 50%;
+    background: var(--color-tinta); border: 2px solid var(--color-papel);
+    box-shadow: 0 1px 3px rgb(0 0 0 / .3); cursor: grab;
+  }
+  :focus-visible { outline: 2px solid var(--color-tinta); outline-offset: 3px; border-radius: 3px }
+}

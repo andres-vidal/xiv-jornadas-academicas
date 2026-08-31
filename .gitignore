@@ -1,0 +1,17 @@
+.DS_Store
+node_modules/
+
+# ajustes locales de las herramientas
+.claude/
+
+# archivos de bloqueo que deja Office mientras el documento está abierto
+~$*
+
+# salidas de R y de los builds, todas regenerables
+Rplots.pdf
+img/
+app-react/dist/
+
+# postulación al evento: no hace falta para el póster ni para la app
+Postulación XIV Jornadas Académicas.docx
+Postulación XIV Jornadas Académicas.pdf
