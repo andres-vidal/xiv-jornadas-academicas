@@ -119,12 +119,18 @@ export default function App() {
       <header ref={headerRef}
               className="absolute inset-x-0 top-0 z-20 flex flex-wrap items-center gap-x-4 gap-y-2
                          border-b border-regla bg-papel/85 px-3 py-2 backdrop-blur-[10px]">
-        {/* on a narrow screen the title takes its own line and the rest drops down */}
-        <b className="w-full text-[1.04rem] font-bold sm:w-auto sm:text-[1.06rem]">
+        {/* On a narrow screen it goes to two lines: the title and the buttons share the
+            first one, the views take the second. The three of them in a row wrap into a
+            lone strip of buttons pushed to the right, with a hole beside it. The order
+            classes put the buttons ahead of the views for that, and leave the reading
+            order alone from sm up. */}
+        <b className="order-1 min-w-0 flex-1 text-[1.04rem] font-bold
+                      sm:w-auto sm:flex-none sm:text-[1.06rem]">
           {t.title}
         </b>
 
-        <div className="inline-flex min-w-0 overflow-hidden rounded-lg border border-regla"
+        <div className="order-3 inline-flex min-w-0 overflow-hidden rounded-lg border border-regla
+                        sm:order-2"
              role="group" aria-label={t.header.views}>
           {VIEWS.map(({ key, path }, i) => (
             <button key={key} type="button" onClick={() => goTo(path)}
@@ -137,7 +143,7 @@ export default function App() {
           ))}
         </div>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="order-2 ml-auto flex items-center gap-2 sm:order-3">
           {/* the button shows the language it takes you to, not the one in use */}
           <HeaderButton onClick={() => setLang(lang === "es" ? "en" : "es")}
                         aria-label={t.header.toOtherLang}>
