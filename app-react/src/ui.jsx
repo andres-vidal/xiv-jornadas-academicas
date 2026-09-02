@@ -1,12 +1,23 @@
 /* The interface pieces that repeat across the app: the floating card, the small
    caps label, the dropdown, the icon button with its tooltip and the animated
    collapse. None of them knows anything about trees or about data. */
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import {
   FloatingFocusManager, FloatingOverlay, FloatingPortal, autoUpdate, flip, offset, shift,
   useDismiss, useFloating, useFocus, useHover, useInteractions, useRole,
 } from "@floating-ui/react";
 import { ChevronIcon } from "./icons.jsx";
+import { useT } from "./useLang.js";
+
+/* A sentence out of strings.js, drawn: *between asterisks* comes out bold and
+   {name} is replaced by the matching value. Keeping the two marks inside the
+   sentence means each one stays whole in the dictionary, instead of being cut into
+   pieces that only make sense next to each other. */
+export function rich(text, vars = {}) {
+  const fill = s => s.replace(/\{(\w+)\}/g, (_, k) => vars[k]);
+  return text.split("*").map((part, i) =>
+    i % 2 ? <b key={i}>{fill(part)}</b> : <Fragment key={i}>{fill(part)}</Fragment>);
+}
 
 /* Every card floats over the canvas, so it is translucent and blurred: the
    drawing keeps showing through. */
@@ -29,9 +40,10 @@ export function CardHeader({ title, children }) {
   );
 }
 
-export function CloseButton({ onClick, label = "Cerrar" }) {
+export function CloseButton({ onClick, label }) {
+  const t = useT();
   return (
-    <button type="button" aria-label={label} onClick={onClick}
+    <button type="button" aria-label={label || t.ui.close} onClick={onClick}
       className="px-1 text-lg leading-none text-mudo hover:text-tinta">×</button>
   );
 }

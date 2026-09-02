@@ -7,9 +7,12 @@ import Legend from "./Legend.jsx";
 import TreePanel from "./TreePanel.jsx";
 import { useRef } from "react";
 import { useElementHeight, useViewportHeight } from "./useViewport.js";
+import { decimal } from "./strings.js";
+import { useLang } from "./useLang.js";
 
 export default function GameView({ config, plane, game, hidden, hasRoom, narrow, top }) {
   const { D, mode, rule } = config;
+  const lang = useLang();
   const A = plane.A;
   /* the shadow band only exists when there is a node to project; the controls rest
      on it so they do not float far away on a tall screen */
@@ -51,8 +54,8 @@ export default function GameView({ config, plane, game, hidden, hasRoom, narrow,
               more card does not fit on a phone screen */}
           <ActionBar game={game} mode={mode}
                      index={hasRoom || !game.canSplit ? null
-                       : A.index(game.sel.ids, game.deg, mode === "pp" ? game.sel.classes : null)
-                            .toFixed(2).replace(".", ",")} />
+                       : decimal(lang, A.index(game.sel.ids, game.deg,
+                                             mode === "pp" ? game.sel.classes : null))} />
         </div>
       </div>
     </div>

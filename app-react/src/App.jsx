@@ -11,9 +11,11 @@ import { planeFor } from "./data.js";
 import { makeTree } from "./tree-logic.js";
 import { useConfig } from "./useConfig.js";
 import { useGame } from "./useGame.js";
+import { STRINGS } from "./strings.js";
+import { LangContext } from "./useLang.js";
 import { HeaderButton } from "./ui.jsx";
 import { GearIcon, HelpIcon, InfoIcon } from "./icons.jsx";
-import { WorkCard, WorkDialog } from "./WorkPanel.jsx";
+import { WorkCard, WorkDialog, WorkFolded } from "./WorkPanel.jsx";
 import HelpDialog from "./HelpDialog.jsx";
 import SettingsPanel from "./SettingsPanel.jsx";
 import Readouts from "./Readouts.jsx";
@@ -22,8 +24,8 @@ import GameView from "./GameView.jsx";
 import CloudView from "./CloudView.jsx";
 
 const VIEWS = [
-  { key: "game", path: "/arbol", label: "Armar el árbol" },
-  { key: "cloud", path: "/nube", label: "Explorar la nube" },
+  { key: "game", path: "/arbol" },
+  { key: "cloud", path: "/nube" },
 ];
 
 export default function App() {
@@ -37,6 +39,19 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [workDialog, setWorkDialog] = useState(false);
+
+  const config = useConfig();
+  const { lang, setLang, dataKey, D, axes, bestPlane, mode, rule } = config;
+  /* App puts the language into the context, so it cannot read it from there: it is
+     the one component that takes its text straight from the dictionary. */
+  const t = STRINGS[lang];
+
+  /* the page itself speaks the language too: screen readers and the browser's
+     translation prompt both go by this */
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    document.title = t.documentTitle;
+  }, [lang, t]);
 
   /* the query carries the settings: changing view must not lose them */
   const goTo = path => {
@@ -82,10 +97,7 @@ export default function App() {
   const narrow = useNarrow();
   const [workOpen, setWorkOpen] = useState(true);
 
-  const config = useConfig();
-  const { dataKey, D, axes, bestPlane, mode, rule } = config;
-
-  const plane = planeFor(dataKey, bestPlane, axes || [0, 1], makeTree);
+  const plane = planeFor(dataKey, bestPlane, axes || [0, 1], makeTree, D.VARS);
   const game = useGame({
     A: plane.A, mode, rule,
     planeSig: `${dataKey}|${bestPlane ? "best" : axes.join(",")}|${mode}|${rule}`,
@@ -97,6 +109,7 @@ export default function App() {
   useEffect(() => { if (view === "cloud") setCloudSeen(true); }, [view]);
 
   return (
+    <LangContext.Provider value={lang}>
     <section className="relative h-[100dvh] w-full overflow-hidden">
       <GameView config={config} plane={plane} game={game} hidden={!inGame}
                 hasRoom={hasRoom} narrow={narrow} top={top} />
@@ -108,44 +121,54 @@ export default function App() {
                          border-b border-regla bg-papel/85 px-3 py-2 backdrop-blur-[10px]">
         {/* on a narrow screen the title takes its own line and the rest drops down */}
         <b className="w-full text-[1.04rem] font-bold sm:w-auto sm:text-[1.06rem]">
-          ¿Y si miramos por otro lado?
+          {t.title}
         </b>
 
         <div className="inline-flex min-w-0 overflow-hidden rounded-lg border border-regla"
-             role="group" aria-label="Qué se muestra">
-          {VIEWS.map(({ key, path, label }, i) => (
+             role="group" aria-label={t.header.views}>
+          {VIEWS.map(({ key, path }, i) => (
             <button key={key} type="button" onClick={() => goTo(path)}
               className={`truncate px-[10px] py-[5px] text-[0.9rem] transition-colors
                 ${i ? "border-l border-regla" : ""}
                 ${view === key ? "bg-tinta font-bold text-papel"
                                : "bg-papel text-mudo hover:bg-panel hover:text-tinta"}`}>
-              {label}
+              {t.header[key]}
             </button>
           ))}
         </div>
 
         <div className="ml-auto flex items-center gap-2">
+          {/* the button shows the language it takes you to, not the one in use */}
+          <HeaderButton onClick={() => setLang(lang === "es" ? "en" : "es")}
+                        aria-label={t.header.toOtherLang}>
+            <span className="font-mono text-[0.72rem] font-bold">{t.header.otherLang}</span>
+          </HeaderButton>
+
           {narrow && (
             <HeaderButton open={workDialog} ref={work.refs.setReference}
-              {...workInt.getReferenceProps({ "aria-label": "El trabajo", "aria-expanded": workDialog })}>
+              {...workInt.getReferenceProps({ "aria-label": t.header.work, "aria-expanded": workDialog })}>
               <InfoIcon />
             </HeaderButton>
           )}
 
           <HeaderButton open={helpOpen} ref={help.refs.setReference}
-            {...helpInt.getReferenceProps({ "aria-label": "De qué se trata", "aria-expanded": helpOpen })}>
+            {...helpInt.getReferenceProps({ "aria-label": t.header.help, "aria-expanded": helpOpen })}>
             <HelpIcon />
           </HeaderButton>
 
           {/* everything set here belongs to the game; the cube has its own card */}
           {inGame && (
             <HeaderButton open={settingsOpen} ref={settings.refs.setReference}
-              {...settingsInt.getReferenceProps({ "aria-label": "Ajustes", "aria-expanded": settingsOpen })}>
+              {...settingsInt.getReferenceProps({ "aria-label": t.header.settings, "aria-expanded": settingsOpen })}>
               <GearIcon />
             </HeaderButton>
           )}
         </div>
       </header>
+
+      {/* the work has no card at this width, so this is what leaves its links in the
+          document for a crawler; it goes while the dialog is up */}
+      {narrow && !workDialog && <WorkFolded />}
 
       {workDialog && narrow && (
         <WorkDialog context={work.context} refs={work.refs}
@@ -169,8 +192,6 @@ export default function App() {
       {/* Top left corner: the work and, below it, the game's numbers. It sits under
           the controls, because on a short wide screen the open card reaches down to
           them and they have to stay usable. */}
-      {/* la esquina va por debajo de los controles: en una pantalla baja y ancha
-          la tarjeta abierta llega hasta ellos y tienen que seguir siendo usables */}
       <div style={{ top }}
            className="pointer-events-none absolute left-3 z-10 flex flex-col items-start gap-2">
         {!narrow && (
@@ -186,5 +207,6 @@ export default function App() {
         )}
       </div>
     </section>
+    </LangContext.Provider>
   );
 }

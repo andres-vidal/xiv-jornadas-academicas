@@ -89,18 +89,22 @@ function scatter3d(rootId, dataId, opts) {
   // [-1, 1], que es donde vive todo coeficiente de una dirección de norma 1.
   // Conserva los estados intermedios "-", "0." y "-0." para poder escribir con
   // naturalidad; "--9" o "++9" simplemente no llegan a formarse.
-  // Los coeficientes se muestran con coma decimal, como el resto de la app.
-  function fmt(v) { return v.toFixed(2).replace(".", ","); }
+  // El separador decimal sigue al idioma de la app: coma en español, punto en
+  // inglés. Viene en los datos porque este archivo no sabe nada de idiomas.
+  var MARCA = data.decimalMark || ",";
+  var OTRA  = MARCA === "," ? "." : ",";
+  var SUCIO = MARCA === "," ? /[^0-9,\-]/g : /[^0-9.\-]/g;
+  function fmt(v) { return v.toFixed(2).replace(".", MARCA); }
   function num(t) { var v = parseFloat(String(t).replace(",", ".")); return isNaN(v) ? 0 : v; }
 
   function sanear(txt) {
-    txt = txt.replace(/\./g, ",").replace(/[^0-9,\-]/g, "");
+    txt = txt.split(OTRA).join(MARCA).replace(SUCIO, "");
     var neg = txt.charAt(0) === "-";
     txt = txt.replace(/-/g, "");
-    var partes = txt.split(",");
-    txt = partes.shift() + (partes.length ? "," + partes.join("") : "");
+    var partes = txt.split(MARCA);
+    txt = partes.shift() + (partes.length ? MARCA + partes.join("") : "");
     if (neg) txt = "-" + txt;
-    var v = parseFloat(txt.replace(",", "."));
+    var v = parseFloat(txt.replace(MARCA, "."));
     if (!isNaN(v) && (v > 1 || v < -1)) txt = v > 1 ? "1" : "-1";
     return txt;
   }

@@ -9,13 +9,14 @@
 import { useEffect, useRef } from "react";
 import { CardHeader, Collapse, FoldButton } from "./ui.jsx";
 import Tree from "./Tree.jsx";
-
-const comma = x => x.replace(".", ",");
+import { percent } from "./strings.js";
+import { useLang, useT } from "./useLang.js";
 
 export default function TreePanel({
   game, plane, D, A, mode, narrow, top, expanded, setExpanded,
 }) {
   const { root, sel, setSelId, nCuts, accuracy } = game;
+  const lang = useLang(), t = useT();
   const ref = useRef(null);
   /* blown up to the whole screen, which only happens with room beside the canvas */
   const zoomed = expanded && !narrow;
@@ -42,8 +43,9 @@ export default function TreePanel({
     };
   }, [zoomed, setExpanded]);
 
-  const title = `el árbol · ${nCuts === 1 ? "1 corte" : `${nCuts} cortes`}` +
-    (nCuts > 0 ? ` · ${comma((accuracy * 100).toFixed(1))} % de aciertos` : "");
+  const cuts = nCuts === 1 ? t.tree.oneCut : t.tree.manyCuts.replace("{n}", nCuts);
+  const title = `${t.tree.title} · ${cuts}`
+    + (nCuts > 0 ? " · " + t.tree.accuracy.replace("{p}", percent(lang, accuracy)) : "");
 
   /* The drawing scales to whatever width there is and never slides sideways: a tree
      you have to drag half of into view is not a tree. */
@@ -72,10 +74,10 @@ export default function TreePanel({
       <CardHeader title={title}>
         {narrow && nCuts > 0 && (
           <FoldButton open={expanded} onClick={() => setExpanded(!expanded)}
-                      labelOpen="Plegar el árbol" labelClosed="Ver el árbol" />
+                      labelOpen={t.tree.fold} labelClosed={t.tree.show} />
         )}
         {zoomed && (
-          <button type="button" aria-label="Achicar el árbol"
+          <button type="button" aria-label={t.tree.shrink}
             onClick={e => { e.stopPropagation(); setExpanded(false); }}
             className="px-[2px] text-base leading-none text-mudo hover:text-tinta">×</button>
         )}
@@ -83,7 +85,7 @@ export default function TreePanel({
 
       {nCuts === 0 ? (
         <p className="py-[6px] text-[0.88rem] leading-[1.35] text-mudo">
-          Todavía sin cortes. Elegir una dirección y cortar.
+          {t.tree.empty}
         </p>
       ) : narrow ? (
         <Collapse open={expanded}>{treeSvg}</Collapse>

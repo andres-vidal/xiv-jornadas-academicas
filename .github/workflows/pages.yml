@@ -31,6 +31,8 @@ jobs:
       - run: npm run build:pages
       # el póster viaja con la app: el modal de ayuda enlaza a /poster.pdf
       - run: cp ../poster-JJAA.pdf dist/poster.pdf
+      # la imagen de la vista previa del enlace, que apuntan las etiquetas og:
+      - run: cp ../assets/og.png dist/og.png
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

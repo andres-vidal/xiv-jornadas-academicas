@@ -4,8 +4,9 @@
 export const CUT_RULES = ["medias", "dispersion", "medianas", "margen", "aciertos"];
 
 /* The direction written as a linear combination, normalised so the largest
-   coefficient is 1, as in the package's print output. */
-export function formula(deg, axisNames = ["Z₁", "Z₂"]) {
+   coefficient is 1, as in the package's print output. The decimal mark comes from
+   outside: the algorithm knows nothing about languages. */
+export function formula(deg, axisNames = ["Z₁", "Z₂"], decimalMark = ",") {
   const t = deg * Math.PI / 180;
   let a = [Math.cos(t), Math.sin(t)];
   const m = Math.max(Math.abs(a[0]), Math.abs(a[1]));
@@ -14,9 +15,9 @@ export function formula(deg, axisNames = ["Z₁", "Z₂"]) {
   a.forEach((v, k) => {
     const av = Math.abs(v);
     if (av < 0.005) return;
-    const signo = out === "" ? (v < 0 ? "−" : "") : (v < 0 ? " − " : " + ");
-    const coef = av > 0.995 ? "" : av.toFixed(2).replace(".", ",") + "·";
-    out += signo + coef + axisNames[k];
+    const sign = out === "" ? (v < 0 ? "−" : "") : (v < 0 ? " − " : " + ");
+    const coef = av > 0.995 ? "" : av.toFixed(2).replace(".", decimalMark) + "·";
+    out += sign + coef + axisNames[k];
   });
   return out;
 }

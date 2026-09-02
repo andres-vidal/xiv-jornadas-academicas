@@ -8,9 +8,11 @@ import CloudPanel from "./CloudPanel.jsx";
 import { CARD, IconButton } from "./ui.jsx";
 import { RobotIcon } from "./icons.jsx";
 import { useHasRoom } from "./useViewport.js";
+import { useT } from "./useLang.js";
 
 export default function CloudView({ config, hidden, top }) {
-  const { dataKey, D, axes3d } = config;
+  const { lang, dataKey, D, axes3d } = config;
+  const t = useT();
   const api = useRef(null);
   const readoutRef = useRef(null);
   /* With no room beside the canvas it starts folded, like the tree in the other
@@ -30,14 +32,14 @@ export default function CloudView({ config, hidden, top }) {
           above and take no room from it, as in the other view. */}
       <div style={{ top: top - 4 }} className="absolute inset-x-3 bottom-3 flex flex-col gap-3">
         <div className="min-h-0 flex-1">
-          <Widget3D key={dataKey + axes3d.join(",")} data={payload3d(D, axes3d)}
+          <Widget3D key={dataKey + axes3d.join(",")} data={payload3d(D, axes3d, lang === "es" ? "," : ".")}
                     apiRef={api} readoutHost={readoutRef} />
         </div>
         <div className={CARD + " flex shrink-0 items-center gap-3 px-3 py-[10px]"}>
           {/* on a phone the two combinations take several lines: the height is capped
               and it scrolls instead of eating the cube */}
           <div ref={readoutRef} className="max-h-[11rem] min-w-0 flex-1 overflow-y-auto sm:max-h-none" />
-          <IconButton label="Usar la mejor proyección" tip="Usar la mejor proyección"
+          <IconButton label={t.cloud.bestPlane} tip={t.cloud.bestPlane}
                       onClick={showBestPlane}><RobotIcon /></IconButton>
         </div>
       </div>

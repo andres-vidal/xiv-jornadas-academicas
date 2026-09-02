@@ -1,10 +1,12 @@
 import { cutValue, formula } from "./tree-logic.js";
+import { decimal } from "./strings.js";
+import { useLang, useT } from "./useLang.js";
 
-/* The threshold with two decimals and a comma. A rounded zero is forced positive,
-   because a cut landing right on the origin came out as "-0,00". */
-const threshold = v => {
+/* The threshold with two decimals. A rounded zero is forced positive, because a
+   cut landing right on the origin came out as "-0,00". */
+const threshold = (lang, v) => {
   const r = Math.round(v * 100) / 100;
-  return (r === 0 ? 0 : r).toFixed(2).replace(".", ",");
+  return decimal(lang, r === 0 ? 0 : r);
 };
 
 const NW = 186, NH = 62, LH = 118, GAP = 20;
@@ -39,9 +41,9 @@ function Histogram({ n, x, y, w, h, PTS, nClasses, color }) {
   );
 }
 
-function NodeBox({ n, x, y, sel, mode, onPick, PTS, nClasses, color, GROUPS, A, axisNames }) {
+function NodeBox({ n, x, y, sel, mode, onPick, PTS, nClasses, color, GROUPS, A, axisNames, lang, t }) {
   const m = A.predict(n, mode), active = A.splittable(n, mode), chosen = n === sel;
-  const tag = n.id === "" ? "walk" : n.id.endsWith("0") ? "de un lado" : "del otro";
+  const tag = n.id === "" ? t.tree.root : n.id.endsWith("0") ? t.tree.oneSide : t.tree.otherSide;
   return (
     <g
       role={active ? "button" : undefined}
@@ -67,7 +69,7 @@ function NodeBox({ n, x, y, sel, mode, onPick, PTS, nClasses, color, GROUPS, A, 
           {/* the node's rule, as it reads: the combination and its threshold */}
           <text x={x} y={y + NH + 21} textAnchor="middle"
                 className="font-mono text-[12px] fill-[var(--color-tinta2)]">
-            {formula(n.deg, axisNames)} ≤ {threshold(cutValue(n.deg, n.cut))}
+            {formula(n.deg, axisNames, lang === "es" ? "," : ".")} ≤ {threshold(lang, cutValue(n.deg, n.cut))}
           </text>
         </>
       ) : (
@@ -83,7 +85,8 @@ function NodeBox({ n, x, y, sel, mode, onPick, PTS, nClasses, color, GROUPS, A, 
           </text>
           <text x={x} y={y + NH + 21} textAnchor="middle"
                 className="font-mono text-[13px] fill-[var(--color-mudo)]">
-            {m.puro ? `${n.ids.length} · puro` : `${m.n} de ${m.total}`}
+            {m.puro ? t.tree.pure.replace("{n}", n.ids.length)
+                    : t.tree.share.replace("{n}", m.n).replace("{total}", m.total)}
           </text>
         </>
       )}
@@ -92,6 +95,7 @@ function NodeBox({ n, x, y, sel, mode, onPick, PTS, nClasses, color, GROUPS, A, 
 }
 
 export default function Tree({ root, sel, mode, onPick, PTS, GROUPS, TOKENS, A, axisNames }) {
+  const lang = useLang(), t = useT();
   const color = k => `var(${TOKENS[k]})`;
   const leafOrder = [];
   (function collectLeaves(n) { n.children ? (collectLeaves(n.children[0]), collectLeaves(n.children[1])) : leafOrder.push(n); })(root);
@@ -122,7 +126,7 @@ export default function Tree({ root, sel, mode, onPick, PTS, GROUPS, TOKENS, A, 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMin meet"
          className="block w-full h-auto"
-         aria-label="Estructura del árbol: cada nodo partido se muestra como un histograma de los datos proyectados, con la combinación lineal que los proyecta y el threshold donde se corta.">
+         aria-label={t.tree.diagram}>
       {allNodes.filter(n => n.children).flatMap(n =>
         n.children.map((h, i) => (
           <path key={`${n.id}-${i}`} fill="none" stroke="var(--color-regla)" strokeWidth={1.4}
@@ -132,7 +136,7 @@ export default function Tree({ root, sel, mode, onPick, PTS, GROUPS, TOKENS, A, 
       {allNodes.map(n => (
         <NodeBox key={n.id} n={n} x={px.get(n)} y={py.get(n)} sel={sel} mode={mode}
               onPick={onPick} PTS={PTS} nClasses={GROUPS.length} color={color}
-              GROUPS={GROUPS} A={A} axisNames={axisNames} />
+              GROUPS={GROUPS} A={A} axisNames={axisNames} lang={lang} t={t} />
       ))}
     </svg>
   );

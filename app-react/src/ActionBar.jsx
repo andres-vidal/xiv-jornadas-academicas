@@ -6,13 +6,17 @@
    whole width instead of sharing it with five buttons. */
 import { CARD, IconButton } from "./ui.jsx";
 import { FlagIcon, ResetIcon, RobotIcon, ScissorsIcon, UndoIcon } from "./icons.jsx";
+import { useT } from "./useLang.js";
 
 export default function ActionBar({ game, mode, index }) {
   const { deg, setDeg, canSplit, cut, sel, nCuts, gameOver, canUndo } = game;
+  const t = useT();
 
-  const cutTip = !sel ? "Elegir un nodo"
-    : !canSplit ? "Nodo cerrado"
-    : `Cortar · ${Math.round(cut.acc * cut.base)} de ${cut.base} correctos`;
+  const cutTip = !sel ? t.actions.pickNode
+    : !canSplit ? t.actions.closedNode
+    : t.actions.cutTip
+        .replace("{right}", Math.round(cut.acc * cut.base))
+        .replace("{total}", cut.base);
 
   return (
     <div className={CARD + " pointer-events-auto flex w-full flex-wrap items-center " +
@@ -21,23 +25,23 @@ export default function ActionBar({ game, mode, index }) {
         <span className="min-w-[3.1em] shrink-0 font-mono text-[1.12rem] font-bold">{deg}°</span>
         <input type="range" min="0" max="359" step="1" value={deg} disabled={!canSplit}
                onChange={e => setDeg(+e.target.value)}
-               aria-label="Ángulo de la dirección, en grados"
+               aria-label={t.actions.angle}
                className="min-w-0 flex-1 disabled:opacity-40" />
       </div>
 
       <div className="flex min-w-0 flex-1 items-center justify-center gap-[9px] sm:flex-none">
-        <IconButton primary tip={cutTip} label="Cortar en esta dirección"
+        <IconButton primary tip={cutTip} label={t.actions.cut}
                     onClick={game.split} disabled={!canSplit}><ScissorsIcon /></IconButton>
-        <IconButton tip="Deshacer" label="Deshacer el último corte"
+        <IconButton tip={t.actions.undoTip} label={t.actions.undo}
                     onClick={game.undo} disabled={!canUndo}><UndoIcon /></IconButton>
-        <IconButton tip={mode === "pp" ? "Automático con ppforest2" : "Automático, a corte libre"}
-                    label="Armar el árbol automáticamente"
+        <IconButton tip={mode === "pp" ? t.actions.autoPackage : t.actions.autoFree}
+                    label={t.actions.auto}
                     onClick={game.auto}><RobotIcon /></IconButton>
         {mode === "gen" && (
-          <IconButton tip="Terminar el árbol" label="Dar el árbol por terminado"
+          <IconButton tip={t.actions.finishTip} label={t.actions.finish}
                       onClick={game.finish} disabled={gameOver || !nCuts}><FlagIcon /></IconButton>
         )}
-        <IconButton tip="Reiniciar" label="Reiniciar el árbol"
+        <IconButton tip={t.actions.resetTip} label={t.actions.reset}
                     onClick={game.reset}><ResetIcon /></IconButton>
       </div>
 
@@ -45,7 +49,7 @@ export default function ActionBar({ game, mode, index }) {
       {index != null && (
         <span className="flex shrink-0 items-center gap-[6px]">
           <i className="font-mono text-[0.72rem] not-italic uppercase tracking-[0.08em]
-                        text-mudo">índice</i>
+                        text-mudo">{t.actions.index}</i>
           <b className="font-mono text-[0.95rem] font-bold">{index}</b>
         </span>
       )}

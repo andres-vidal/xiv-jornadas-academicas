@@ -1,15 +1,16 @@
 /* The two numbers that move while playing: how well the chosen direction splits
    the current node, and how much the tree built so far gets right. */
 import { CARD } from "./ui.jsx";
-
-const comma = x => x.replace(".", ",");
+import { decimal, percent } from "./strings.js";
+import { useLang, useT } from "./useLang.js";
 
 export default function Readouts({ A, root, sel, deg, mode, canSplit, nCuts, accuracy, className = "" }) {
+  const lang = useLang(), t = useT();
   const values = [
-    ["índice del nodo",
-      canSplit ? comma(A.index(sel.ids, deg, mode === "pp" ? sel.classes : null).toFixed(2)) : "—"],
+    [t.readouts.index,
+      canSplit ? decimal(lang, A.index(sel.ids, deg, mode === "pp" ? sel.classes : null)) : "—"],
     /* no cuts, no tree: showing the 25 % of "everything one group" misleads */
-    ["aciertos del árbol", nCuts === 0 ? "—" : `${comma((accuracy * 100).toFixed(1))} %`],
+    [t.readouts.accuracy, nCuts === 0 ? "—" : percent(lang, accuracy)],
   ];
   return (
     <div className={"grid grid-cols-2 gap-2 " + className}>

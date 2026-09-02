@@ -3,14 +3,14 @@
    sits. */
 import { Fragment } from "react";
 import { CARD, CardHeader, Collapse, FoldButton, Label, Menu } from "./ui.jsx";
-import { DATASETS, KEYS, NOTES } from "./data.js";
+import { KEYS } from "./data.js";
+import { useT } from "./useLang.js";
 import DataSource from "./DataSource.jsx";
 import { DefaultsButton } from "./SettingsPanel.jsx";
 
-const AXES = ["eje x", "eje y", "eje z"];
-
 export default function CloudPanel({ config, open, setOpen, top, className = "" }) {
   const { dataKey, D, axes3d, setCfg, setDataset } = config;
+  const t = useT();
 
   /* if the variable is already on another axis, the two axes swap */
   const setAxis = (k, v) => {
@@ -24,20 +24,20 @@ export default function CloudPanel({ config, open, setOpen, top, className = "" 
 
   return (
     <div style={{ top }} className={CARD + " flex flex-col gap-2 p-3 " + className}>
-      <CardHeader title="La nube">
+      <CardHeader title={t.cloud.title}>
         <DefaultsButton config={config} />
         <FoldButton open={open} onClick={() => setOpen(!open)}
-                    labelOpen="Plegar" labelClosed="Ver datos, ejes y leyenda" />
+                    labelOpen={t.ui.fold} labelClosed={t.cloud.show} />
       </CardHeader>
 
       <Collapse open={open} className="max-h-[72dvh] overflow-y-auto">
         <div className="grid grid-cols-[3.6em_1fr] items-center gap-x-2 gap-y-2">
-          <Label>datos</Label>
-          <Menu label="Datos" value={dataKey} onChange={setDataset}
-                options={KEYS.map(k => ({ value: k, text: DATASETS[k].name }))} />
+          <Label>{t.settings.dataLabel}</Label>
+          <Menu label={t.settings.data} value={dataKey} onChange={setDataset}
+                options={KEYS.map(k => ({ value: k, text: t.data[k].name }))} />
           <span />
           <DataSource dataKey={dataKey} />
-          {AXES.map((eje, k) => (
+          {t.cloud.axes.map((eje, k) => (
             <Fragment key={eje}>
               <Label>{eje}</Label>
               <Menu label={eje} value={axes3d[k]} onChange={v => setAxis(k, v)}
@@ -49,9 +49,11 @@ export default function CloudPanel({ config, open, setOpen, top, className = "" 
         {/* what was measured, and why the variables move together */}
         <div className="mt-2 flex flex-col gap-1 border-t border-regla pt-2
                         text-[0.82rem] leading-[1.45] text-mudo">
-          <p>{D.PTS.length} individuos · {D.GROUPS.length} grupos · {D.VARS.length} medidas.</p>
-          <p>{NOTES[dataKey].measures}</p>
-          <p>{NOTES[dataKey].why}</p>
+          <p>{t.cloud.summary.replace("{n}", D.PTS.length)
+                            .replace("{groups}", D.GROUPS.length)
+                            .replace("{vars}", D.VARS.length)}</p>
+          <p>{t.data[dataKey].measures}</p>
+          <p>{t.data[dataKey].why}</p>
         </div>
 
         <div className="mt-2 flex flex-col gap-[3px] border-t border-regla pt-2">

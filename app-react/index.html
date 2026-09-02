@@ -4,6 +4,23 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>¿Y si miramos por otro lado?</title>
+<meta name="description" content="Un árbol de clasificación que corta por combinaciones lineales de todas las variables. Elegir la dirección, ver la sombra de los datos y armar el árbol paso a paso.">
+<link rel="canonical" href="https://andres-vidal.github.io/xiv-jornadas-academicas/">
+
+<!-- Vista previa del enlace. La página se dibuja entera con JavaScript y los
+     lectores de WhatsApp, Slack y compañía no lo ejecutan, así que esto es lo
+     único que ven. Las direcciones tienen que ser absolutas. -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://andres-vidal.github.io/xiv-jornadas-academicas/">
+<meta property="og:site_name" content="XIV Jornadas Académicas">
+<meta property="og:locale" content="es_UY">
+<meta property="og:title" content="¿Y si miramos por otro lado?">
+<meta property="og:description" content="Búsqueda de proyecciones para revelar estructuras de grupos en datos multivariados. Elegir la dirección de corte y armar el árbol paso a paso.">
+<meta property="og:image" content="https://andres-vidal.github.io/xiv-jornadas-academicas/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Las medidas de los cangrejos proyectadas sobre dos discriminantes: los cuatro grupos quedan separados.">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iNyIgZmlsbD0iI2Y3ZjdmNyIvPgogIDxwYXRoIGQ9Ik00LjUgMjQuNSAyNy41IDcuNSIgc3Ryb2tlPSIjMjIyMjIyIiBzdHJva2Utd2lkdGg9IjMuMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPGNpcmNsZSBjeD0iMTAiIGN5PSI5LjUiIHI9IjQuNiIgZmlsbD0iI2U4NjYyZSIvPgogIDxjaXJjbGUgY3g9IjIyIiBjeT0iMjIuNSIgcj0iNC42IiBmaWxsPSIjM2I1MDcyIi8+Cjwvc3ZnPgo=">
 <meta name="theme-color" content="#f7f7f7">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,6 +28,25 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Mono&family=PT+Sans:ital,wght@0,400;0,700;1,400&display=swap">
 </head>
 <body>
+<!-- La página se dibuja entera con JavaScript, así que sin él el cuerpo queda vacío.
+     Esto es lo que ve quien lo tenga apagado, y también lo único que leen los
+     rastreadores que no ejecutan JavaScript, que son casi todos menos Google. -->
+<noscript>
+  <div style="max-width:38rem;margin:3rem auto;padding:0 1.2rem;line-height:1.55">
+    <h1 style="font-size:1.4rem;margin:0">¿Y si miramos por otro lado?</h1>
+    <p>Búsqueda de proyecciones para revelar estructuras de grupos en datos multivariados.
+       Andrés Vidal Berriel, Licenciatura en Estadística. Referente: Natalia da Silva,
+       IESTA, FCEA — Udelar. XIV Jornadas Académicas.</p>
+    <p>La parte interactiva necesita JavaScript. El resto del trabajo está acá:</p>
+    <ul>
+      <li><a href="https://andres-vidal.github.io/busqueda-de-proyecciones/informe.html">Búsqueda de proyecciones</a>, el material completo</li>
+      <li><a href="https://github.com/andres-vidal/ppforest2">ppforest2</a>, el paquete de R</li>
+      <li><a href="https://andres-vidal.github.io/xiv-jornadas-academicas/poster.pdf">El póster</a>, en PDF</li>
+      <li><a href="https://fcea.udelar.edu.uy/campanas/Jornadas_Academicas/2026/">XIV Jornadas Académicas</a>, FCEA — Udelar</li>
+      <li><a href="https://andresvidal.dev">Andrés Vidal Berriel</a>, el autor</li>
+    </ul>
+  </div>
+</noscript>
 <div id="root"></div>
 <script type="module" src="/src/main.jsx"></script>
 </body>
