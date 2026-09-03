@@ -8,8 +8,14 @@ export const CAM0 = { k: 1, cx: 0, cy: 0 };
 export const ZOOM = [0.25, 24];
 
 /* UY = units visible vertically at zoom 1; each plane sets its own. */
-/* Height of the shadow band: the HUD anchors to this same number. */
-export const bandHeight = (H, hay = true) => hay ? Math.max(72, Math.min(132, H * 0.15)) : 0;
+/* Height of the shadow band: the HUD anchors to this same number.
+
+   It never takes more than half the board. On a very short one the floor of 72 is
+   taller than the board itself, the plot is left with a negative height, and the
+   scale that comes out of it is negative: the canvas then throws on the first
+   radius it is handed. */
+export const bandHeight = (H, withBand = true) =>
+  withBand ? Math.min(Math.max(72, Math.min(132, H * 0.15)), H / 2) : 0;
 
 export function frame(W, H, cam = CAM0, UY = 16.4, withBand = true) {
   const band = bandHeight(H, withBand);
