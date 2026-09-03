@@ -30,7 +30,7 @@ export function useGame({ A, mode, rule, planeSig }) {
 
   const sel = useMemo(() => (selId === null ? null : A.findNode(root, selId)), [A, root, selId]);
   const canSplit = sel ? A.splittable(sel, mode) : false;
-  const cut = canSplit ? A.bestCut(sel, deg, rule) : null;
+  const cut = canSplit ? A.bestCut(sel, deg, rule, mode) : null;
   const nCuts = A.leaves(root).length - 1;
   const accuracy = A.accuracy(root, mode);
   /* the tree is done when nothing can be cut any more, or when the player says so */

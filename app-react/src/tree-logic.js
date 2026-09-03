@@ -107,18 +107,25 @@ export function makeTree(PTS, nClases) {
   /* The classes are ordered by their projected mean and split into two blocks.
      Where the threshold lands between the blocks is what the rule decides;
      "medias" is the mean of the two block means, which is what ppforest2 does.
-     The mode does not touch this: it only changes how the data is divided
-     afterwards, since "pp" hands whole classes to each child and "gen" lets a
-     class fall on both sides and each leaf votes by majority. */
-  function bestCut(n, deg, rule = "medias") {
+     The mode decides which classes are ordered: "pp" separates only the ones the
+     node was handed, "gen" every class whose points are here, since there a class
+     may fall on both sides and each leaf votes by majority. */
+  function bestCut(n, deg, rule = "medias", mode) {
     const t = deg * Math.PI / 180, u = [Math.cos(t), Math.sin(t)];
     const proj = i => PTS[i][0] * u[0] + PTS[i][1] * u[1];
+    /* In "pp" the node separates the classes it was handed, not every class whose
+       points leaked into it at the parent cut. Ordering all of them would place the
+       threshold between two groups this node does not own, and the direction, chosen
+       for the assigned classes, would not match it. So here we look only at the
+       points of those classes; in "gen" a class can fall on both sides, so every
+       point counts. */
+    const ownIds = mode === "pp" && n.classes
+      ? n.ids.filter(i => n.classes.includes(PTS[i][2])) : n.ids;
     const sum = {}, count = {};
-    n.ids.forEach(i => {
+    ownIds.forEach(i => {
       const k = PTS[i][2];
       sum[k] = (sum[k] || 0) + proj(i); count[k] = (count[k] || 0) + 1;
     });
-    /* the cut does not depend on the mode: both use the groups actually present */
     const G = Object.keys(count).map(Number).filter(k => count[k]);
     const base = G.reduce((s, k) => s + count[k], 0);
     if (G.length < 2) return { acc: 0, z: 0, leftC: null, rightC: null, base };
@@ -126,7 +133,7 @@ export function makeTree(PTS, nClases) {
     const mean = k => sum[k] / count[k];
     const order = [...G].sort((a, b) => mean(a) - mean(b));
     const avg = ks => ks.reduce((s, k) => s + mean(k), 0) / ks.length;
-    const values = ks => n.ids.filter(i => ks.includes(PTS[i][2])).map(proj);
+    const values = ks => ownIds.filter(i => ks.includes(PTS[i][2])).map(proj);
 
     function threshold(leftC, rightC) {
       if (rule === "medias") return (avg(leftC) + avg(rightC)) / 2;
@@ -146,9 +153,8 @@ export function makeTree(PTS, nClases) {
       const leftC = order.slice(0, c), rightC = order.slice(c);
       const cut = threshold(leftC, rightC);
       let ok = 0;
-      n.ids.forEach(i => {
+      ownIds.forEach(i => {
         const k = PTS[i][2];
-        if (!G.includes(k)) return;
         if (leftC.includes(k) ? proj(i) <= cut : proj(i) > cut) ok++;
       });
       const acc = base ? ok / base : 0;
@@ -201,7 +207,7 @@ export function makeTree(PTS, nClases) {
   function split(root, id, deg, mode, rule) {
     const n = findNode(root, id);
     if (!n || !splittable(n, mode)) return root;
-    const c = bestCut(n, deg, rule);
+    const c = bestCut(n, deg, rule, mode);
     const t = deg * Math.PI / 180, u = [Math.cos(t), Math.sin(t)];
     const a = [], b = [];
     n.ids.forEach(i => ((PTS[i][0] * u[0] + PTS[i][1] * u[1]) <= c.z ? a : b).push(i));

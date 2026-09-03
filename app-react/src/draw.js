@@ -135,7 +135,7 @@ export function draw(cv, { root, sel, deg, mode, rule, col, cg, W, H, cam, PTS, 
   if (!sel || !splittable(sel, mode)) return;
 
   /* ---------- projection axis, rays and shadow ---------- */
-  const c = bestCut(sel, deg, rule);
+  const c = bestCut(sel, deg, rule, mode);
   const nn = [-u[1], u[0]];
   const zs = [], ws = [];
   sel.ids.forEach(i => {
